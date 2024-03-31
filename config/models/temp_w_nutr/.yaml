@@ -1,0 +1,35 @@
+DATA:
+  DIR: /srv/datasets2/recipe1m+/food.com_data_rescaled
+  MAX_INGRS: 20
+  MAX_INGRS_LEN: 15
+  MAX_INSTRS: 20
+  MAX_INSTRS_LEN: 20
+  NAME: food.com
+  NUM_NUTRS: 4
+  PATH_NUTRS: /srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json
+  PATH_TOKENIZED_RECIPES: /srv/datasets2/recipe1m+/food.com_data_rescaled/text/tokenized_recipe.json
+EVAL: {}
+INFER: {}
+MODEL:
+  EMB_DIM: 768
+  RECIPE:
+    NAME: ht
+    NUM_HEADS: 4
+    NUM_LAYERS: 2
+    PRETRAINED: google-bert/bert-base-uncased
+    VOCAB_SIZE: 200000
+OUT_DIR: out
+RETRIEVAL_DIR: /tmp/food.com_net
+SAVE_PATH: models/temp_w_nutr/
+TITLE:
+- test
+TRAIN:
+  BATCH_SIZE: 64
+  FINETUNE: false
+  LR: 1.0e-05
+  NUM_EPOCHS: 100
+  NUM_WORKERS: 4
+  RECIPE_LOSS_WEIGHT: 1.0
+  SCALE_LR: 1.0
+  SEED: 12345
+  WEIGHT_DECAY: 1.0e-05

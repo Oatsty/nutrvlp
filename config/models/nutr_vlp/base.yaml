@@ -1,0 +1,43 @@
+DATA:
+  DIR: /srv/datasets2/recipe1m+/food.com_data_rescaled
+  MAX_INGRS: 20
+  MAX_INGRS_LEN: 15
+  MAX_INSTRS: 20
+  MAX_INSTRS_LEN: 20
+  NAME: food.com
+  NUM_NUTRS: 4
+  PATH_NUTRS: /srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json
+  PATH_TOKENIZED_RECIPES: /srv/datasets2/recipe1m+/food.com_data_vlp/text/tokenized_recipe.json
+EVAL: {}
+IMG_MODEL_PATH: ''
+INFER: {}
+MODEL:
+  EMB_DIM: 1024
+  IMAGE:
+    VISION_WIDTH: 768
+  RECIPE:
+    HIDDEN_DIM: 512
+    NAME: ht
+    NUM_HEADS: 4
+    NUM_LAYERS: 2
+    PRETRAINED: google-bert/bert-base-uncased
+    VOCAB_SIZE: 199438
+OUT_DIR: out
+RECIPE_MODEL_PATH: ''
+RETRIEVAL_DIR: /tmp/food.com_net
+SAVE_PATH: models/nutr_vlp/base
+TITLE:
+- test
+TRAIN:
+  BATCH_SIZE: 32
+  FINETUNE: false
+  LOSS: weighted_triplet
+  LR: 1.0e-05
+  NUM_EPOCHS: 100
+  NUM_WORKERS: 4
+  RECIPE_LOSS_WEIGHT: 1.0
+  SCALE_LR: 1.0
+  SEED: 12345
+  WARMUP_EPOCHS: 10
+  WEIGHT_DECAY: 1.0e-05
+VLP_PATH: vlpcook_checkpoints/ckpt_best_eval_epoch.metric.recall_at_1_im2recipe_mean_model.pth.tar
