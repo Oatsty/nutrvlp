@@ -1,0 +1,5 @@
+,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per recipe,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,per 100 g,iou,weighted_iou
+,mase@1,mase@5,mase@10,mae@1,mae@1,mae@1,mae@1,mae@5,mae@5,mae@5,mae@5,mae@10,mae@10,mae@10,mae@10,mase@1,mase@5,mase@10,mae@1,mae@1,mae@1,mae@1,mae@5,mae@5,mae@5,mae@5,mae@10,mae@10,mae@10,mae@10,,
+,,,,energy,fat,carb,protein,energy,fat,carb,protein,energy,fat,carb,protein,,,,energy,fat,carb,protein,energy,fat,carb,protein,energy,fat,carb,protein,,
+deep/direct_ingrs/base/food_test,,,0.5620122096664075,,,,,,,,,54.68627113609041,4.96494601423444,7.039246268309668,2.1803253295127365,,,,,,,,,,,,,,,,32.66187624829592,
+deep/direct_ingrs_3_branches/base/food_test,,,0.5592945510000363,,,,,,,,,54.642155478992336,4.919859429047725,6.97757075846235,2.1793343815987845,,,,,,,,,,,,,,,,32.183756376334394,
