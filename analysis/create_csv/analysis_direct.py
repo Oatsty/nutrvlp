@@ -70,10 +70,11 @@ def main():
     dirs = [
         # 'deep/direct/base/food_test',
         # 'deep/direct_3_branches/base/food_test',
-        'deep/direct_ingrs/base/food_test',
-        'deep/direct_ingrs_3_branches/base/food_test',
+        # 'deep/direct_ingrs/base/food_test',
+        # 'deep/direct_ingrs_3_branches/base/food_test',
+        'deep_ht/direct_ingrs_3_branches/no_nutr/food_test'
     ]
-    output_name = 'all_deep_direct_ingrs'
+    output_name = 'deep_ht_no_nutr'
 
     with open('/srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json') as f:
         nutr_g_per_recipes = json.load(f)

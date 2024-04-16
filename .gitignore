@@ -3,3 +3,6 @@ out/
 test/
 vlpcook_checkpoints/
 log/
+__pycache__
+/ht_checkpoints/
+/analysis/figs/

@@ -48,6 +48,7 @@ _C.MODEL.RECIPE.NUM_LAYERS = 2
 _C.MODEL.RECIPE.HIDDEN_DIM = 512
 _C.MODEL.IMAGE = CN()
 _C.MODEL.IMAGE.VISION_WIDTH = 768
+_C.MODEL.IMAGE.IMAGE_MODEL = 'vit_base_patch16_224'
 _C.MODEL.NUTR = CN()
 _C.MODEL.NUTR.HIDDEN_DIM = 2048
 _C.MODEL.NUTR.NUM_LAYERS = 6
@@ -94,6 +95,7 @@ _C.OUT_DIR = "out"
 _C.RETRIEVAL_DIR = "/tmp/food.com_net"
 _C.TITLE = ["test"]
 _C.VLP_PATH = "vlpcook_checkpoints/ckpt_best_eval_epoch.metric.recall_at_1_im2recipe_mean_model.pth.tar"
+_C.HT_PATH = "ht_checkpoints/model-best.ckpt"
 
 
 def _update_config_from_file(config, cfg_file):

@@ -4,7 +4,13 @@ import numpy as np
 import os
 import pandas as pd
 
-def save_im2recipe_dict(im2recipe,saved_ids,dir):
+def save_im2recipe_dict(dir):
+    if os.path.exists(f'../results/{dir}.json'):
+        with open(f'../results/{dir}.json') as f:
+            return json.load(f)
+    im2recipe = np.load(f'../../out/models/{dir}/im2recipe.npy')
+    with open(f'../../out/models/{dir}/saved_ids','rb') as f:
+        saved_ids = pickle.load(f)
     im2recipe_dict = {}
     for i, sorted_recipe in enumerate(im2recipe):
         avail_sorted_recipe = [saved_ids[idx] for idx in sorted_recipe if idx != i][:20]
@@ -96,15 +102,32 @@ def pred_nutr(im2recipe_dict, nutr_per_recipes, top_k: int):
 
 
 def main():
+    # dirs = [
+    #     'ht/base',
+    #     'vlpcook/base',
+    #     'clip/img/test',
+    #     'clip/text/test',
+    #     'clip/text_img/test',
+    #     # 'nutr_vlp/base/food_test',
+    #     'deep/direct_ingrs_3_branches/base/food_test_recipe_img',
+    #     'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_img',
+    #     'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_only',
+    # ]
+    # output_name = 'ht2_newest_all_comaparison'
+
     dirs = [
+        'ht/base',
+        'tfood/base',
         'vlpcook/base',
         'clip/img/test',
         'clip/text/test',
         'clip/text_img/test',
-        'nutr_vlp/base/food_test',
-        'deep/direct_ingrs_3_branches/base/food_test_recipe_img'
+        # 'nutr_vlp/base/food_test',
+        # 'deep/direct_ingrs_3_branches/base/food_test_recipe_img',
+        # 'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_img',
+        'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
     ]
-    output_name = 'new_all_comaparison'
+    output_name = 'ht3_newest_all_comaparison'
 
     # dirs = [
     #     'deep/base/base/food_test_all_domains',
@@ -138,6 +161,26 @@ def main():
     # output_name = 'ablation_deep_recipe_img'
 
     # dirs = [
+    #     'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/triplet/food_test_recipe_only',
+    #     'deep_ht/base_3_branches/base/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs/base/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/ingrs_only/food_test_recipe_only',
+    # ]
+
+    # output_name = 'ablation_ht2_recipe_only'
+
+    # dirs = [
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr_triplet/food_test_recipe_only',
+    #     'deep_ht/base/no_nutr/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr_ingrs_only/food_test_recipe_only',
+    # ]
+
+    # output_name = 'ablation_ht3_recipe_only'
+
+    # dirs = [
     #     'deep/base/vlpcook/food_test_recipe_img',
     #     'deep/base/triplet/food_test_recipe_img',
     #     'deep/base/base/food_test_recipe_img',
@@ -147,6 +190,28 @@ def main():
     # ]
 
     # output_name = 'complete_ablation_deep_recipe_img'
+
+    # dirs = [
+    #     'ht/base',
+    #     'deep_ht/base/triplet/food_test_recipe_only',
+    #     'deep_ht/base/base/food_test_recipe_only',
+    #     'deep_ht/base_3_branches/base/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/ingrs_only/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_only',
+    # ]
+
+    # output_name = 'complete_ablation_ht2_recipe_only'
+
+    # dirs = [
+    #     'ht/base',
+    #     'deep_ht/base/no_nutr_triplet/food_test_recipe_only',
+    #     'deep_ht/base/no_nutr/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr_ingrs_only/food_test_recipe_only',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
+    # ]
+
+    # output_name = 'complete_ablation_ht3_recipe_only'
+
 
     with open('/home/parinayok/nutr1m/data_crawl/food.com_annotated_nutr_per_recipe_old.json') as f:
         nutr_per_recipes = json.load(f)
@@ -161,6 +226,7 @@ def main():
         ('per recipe','mase@1',''),
         ('per recipe','mase@5',''),
         ('per recipe','mase@10',''),
+        ('per recipe','mase@20',''),
         ('per recipe','mae@1','energy'),
         ('per recipe','mae@1','fat'),
         ('per recipe','mae@1','carb'),
@@ -173,9 +239,14 @@ def main():
         ('per recipe','mae@10','fat'),
         ('per recipe','mae@10','carb'),
         ('per recipe','mae@10','protein'),
+        ('per recipe','mae@20','energy'),
+        ('per recipe','mae@20','fat'),
+        ('per recipe','mae@20','carb'),
+        ('per recipe','mae@20','protein'),
         ('per 100 g','mase@1',''),
         ('per 100 g','mase@5',''),
         ('per 100 g','mase@10',''),
+        ('per 100 g','mase@20',''),
         ('per 100 g','mae@1','energy'),
         ('per 100 g','mae@1','fat'),
         ('per 100 g','mae@1','carb'),
@@ -188,24 +259,25 @@ def main():
         ('per 100 g','mae@10','fat'),
         ('per 100 g','mae@10','carb'),
         ('per 100 g','mae@10','protein'),
+        ('per 100 g','mae@20','energy'),
+        ('per 100 g','mae@20','fat'),
+        ('per 100 g','mae@20','carb'),
+        ('per 100 g','mae@20','protein'),
         ('iou','',''),
         ('weighted_iou','',''),
     ])
     output_df = pd.DataFrame([],columns=index)
 
     for dir in dirs:
-        dir2 = ' '.join(dir.split('/')[:-1])
+        dir2 = ' '.join(dir.split('/'))
         output_df.loc[dir2] = pd.Series(dtype='float64')
         print(f'analyzing {dir}')
-        im2recipe = np.load(f'../../out/models/{dir}/im2recipe.npy')
-        with open(f'../../out/models/{dir}/saved_ids','rb') as f:
-            saved_ids = pickle.load(f)
 
-        im2recipe_dict = save_im2recipe_dict(im2recipe,saved_ids,dir)
+        im2recipe_dict = save_im2recipe_dict(dir)
         iou, weighted_iou = cal_mean_iou(im2recipe_dict,food_ids_per_recipes,weighted_food_ids_per_recipes)
         output_df.loc[dir2,('iou','','')] = iou
         output_df.loc[dir2,('weighted_iou','','')] = weighted_iou
-        for top_k in [1,5,10]:
+        for top_k in [1,5,10,20]:
             #topk per recipe
             gts, preds, absolute_errors, percentage_errors, symmetric_percentage_errors = pred_nutr(im2recipe_dict,nutr_per_recipes,top_k)
             all_mase = []
@@ -236,3 +308,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+#

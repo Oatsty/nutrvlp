@@ -96,7 +96,7 @@ def pred_nutr(im2recipe_dict, nutr_per_recipes, top_k: int):
 
 
 def main():
-    dir1 = 'deep/base_3_branches/base/food_test'
+    dir1 = 'deep_ht/direct_ingrs_3_branches/no_nutr/food_test'
     with open('/home/parinayok/nutr1m/data_crawl/food.com_annotated_nutr_per_recipe_old.json') as f:
         nutr_per_recipes = json.load(f)
     with open('/srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json') as f:
@@ -110,6 +110,7 @@ def main():
         ('per recipe','mase@1',''),
         ('per recipe','mase@5',''),
         ('per recipe','mase@10',''),
+        ('per recipe','mase@20',''),
         ('per recipe','mae@1','energy'),
         ('per recipe','mae@1','fat'),
         ('per recipe','mae@1','carb'),
@@ -122,9 +123,14 @@ def main():
         ('per recipe','mae@10','fat'),
         ('per recipe','mae@10','carb'),
         ('per recipe','mae@10','protein'),
+        ('per recipe','mae@20','energy'),
+        ('per recipe','mae@20','fat'),
+        ('per recipe','mae@20','carb'),
+        ('per recipe','mae@20','protein'),
         ('per 100 g','mase@1',''),
         ('per 100 g','mase@5',''),
         ('per 100 g','mase@10',''),
+        ('per 100 g','mase@20',''),
         ('per 100 g','mae@1','energy'),
         ('per 100 g','mae@1','fat'),
         ('per 100 g','mae@1','carb'),
@@ -137,6 +143,10 @@ def main():
         ('per 100 g','mae@10','fat'),
         ('per 100 g','mae@10','carb'),
         ('per 100 g','mae@10','protein'),
+        ('per 100 g','mae@20','energy'),
+        ('per 100 g','mae@20','fat'),
+        ('per 100 g','mae@20','carb'),
+        ('per 100 g','mae@20','protein'),
         ('iou','',''),
         ('weighted_iou','',''),
     ])
@@ -154,7 +164,7 @@ def main():
         iou, weighted_iou = cal_mean_iou(im2recipe_dict,food_ids_per_recipes,weighted_food_ids_per_recipes)
         output_df.loc[dir2,('iou','','')] = iou
         output_df.loc[dir2,('weighted_iou','','')] = weighted_iou
-        for top_k in [1,5,10]:
+        for top_k in [1,5,10,20]:
             #topk per recipe
             gts, preds, absolute_errors, percentage_errors, symmetric_percentage_errors = pred_nutr(im2recipe_dict,nutr_per_recipes,top_k)
             all_mase = []
