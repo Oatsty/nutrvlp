@@ -6,6 +6,7 @@ import torch
 sys.path.append('/home/parinayok/food.com_net')
 
 import init_config
+from trainer import get_trainer
 
 logger = logging.getLogger()
 
