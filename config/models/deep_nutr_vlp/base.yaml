@@ -20,7 +20,8 @@ DATA:
   PATH_INGRS: /srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/simplified_food_ids_per_recipes.json
   PATH_NUTRS: /srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json
   PATH_TOKENIZED_RECIPES: /srv/datasets2/recipe1m+/food.com_data_vlp/text/tokenized_recipe.json
-EVAL: {}
+EVAL:
+  NAME: nutr_vlp_direct_ingrs
 IMG_MODEL_PATH: ''
 INFER: {}
 MODEL:

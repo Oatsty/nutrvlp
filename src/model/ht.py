@@ -348,8 +348,10 @@ class HT(nn.Module):
     def forward(self,recipe: Dict[str,torch.Tensor], img: torch.Tensor):
         out = {}
         out['image_embedding'], out['recipe_embedding'], _ = self.joint_embedding(img, recipe['title'], recipe['ingrs'], recipe['instrs'])
+        # not in original paper
+        out['image_embedding'] = F.normalize(out['image_embedding'])
+        out['recipe_embedding'] = F.normalize(out['recipe_embedding'])
         return out
-
 
 def get_model(args, vocab_size):
     model = JointEmbedding(vocab_size=vocab_size,

@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from timm.scheduler import CosineLRScheduler
 from tqdm import tqdm
 
-from ..utils.metrics import cal_mae
+from utils.metrics import cal_mae
 from .base import BaseVLPTrainer
 
 logger = logging.getLogger()

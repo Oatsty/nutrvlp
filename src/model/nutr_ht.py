@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 from model.base_nutr import DeepNutrEncoder
 
-from .ht import HT
+from .ht import HT, get_image_model
 
 class NutrHT(HT):
     def __init__(self, output_size, image_model, vocab_size, hidden_recipe, n_heads, n_layers, num_nutrs, nutr_hidden_size, nutr_num_layers):
@@ -55,6 +55,41 @@ class NutrHTDirectIngredient(NutrHT):
         out['ingrs'] = self.ingr_decoder(out['image_embedding'])
         return out
 
+class NutrOnlyHT(NutrHT):
+    def __init__(self, output_size, image_model, vocab_size, hidden_recipe, n_heads, n_layers, num_nutrs, nutr_hidden_size, nutr_num_layers):
+        super(NutrOnlyHT,self).__init__(output_size, image_model, vocab_size, hidden_recipe, n_heads, n_layers, num_nutrs, nutr_hidden_size, nutr_num_layers)
+        self.nutr_decoder = nn.Sequential(
+            nn.Linear(output_size,output_size),
+            nn.ReLU(),
+            nn.Linear(output_size,num_nutrs)
+        )
+
+    def forward(self, img: torch.Tensor):
+        out_img = self.joint_embedding.image_encoder(img,freeze_backbone=False)
+        out = self.nutr_decoder(out_img)
+        return out
+
+class NutrIngrOnlyHT(NutrHT):
+    def __init__(self, output_size, image_model, vocab_size, hidden_recipe, n_heads, n_layers, num_nutrs, nutr_hidden_size, nutr_num_layers, num_ingrs):
+        super(NutrIngrOnlyHT,self).__init__(output_size, image_model, vocab_size, hidden_recipe, n_heads, n_layers, num_nutrs, nutr_hidden_size, nutr_num_layers)
+        self.nutr_decoder = nn.Sequential(
+            nn.Linear(output_size,output_size),
+            nn.ReLU(),
+            nn.Linear(output_size,num_nutrs)
+        )
+        self.ingr_decoder = nn.Sequential(
+            nn.Linear(output_size,output_size),
+            nn.ReLU(),
+            nn.Linear(output_size,num_ingrs)
+        )
+
+    def forward(self, img: torch.Tensor):
+        out_img = self.joint_embedding.image_encoder(img,freeze_backbone=False)
+        out = {}
+        out['nutr'] = self.nutr_decoder(out_img)
+        out['ingrs'] = self.ingr_decoder(out_img)
+        return out
+
 def create_nutr_ht_model(config,device):
     model_name = config.MODEL.NAME
     output_size = config.MODEL.EMB_DIM
@@ -73,5 +108,9 @@ def create_nutr_ht_model(config,device):
         return NutrHTDirect(output_size,image_model,vocab_size,hidden_recipe,num_heads,num_layers,num_nutrs,hidden_nutr,nutr_num_layers).to(device)
     elif model_name == 'nutr_ht_direct_ingrs':
         return NutrHTDirectIngredient(output_size,image_model,vocab_size,hidden_recipe,num_heads,num_layers,num_nutrs,hidden_nutr,nutr_num_layers,num_ingrs).to(device)
+    elif model_name == 'nutr_only_ht':
+        return NutrOnlyHT(output_size,image_model,vocab_size,hidden_recipe,num_heads,num_layers,num_nutrs,hidden_nutr,nutr_num_layers).to(device)
+    elif model_name == 'nutr_ingr_only_ht':
+        return NutrIngrOnlyHT(output_size,image_model,vocab_size,hidden_recipe,num_heads,num_layers,num_nutrs,hidden_nutr,nutr_num_layers, num_ingrs).to(device)
     else:
         return NutrHT(output_size,image_model,vocab_size,hidden_recipe,num_heads,num_layers,num_nutrs,hidden_nutr,nutr_num_layers).to(device)

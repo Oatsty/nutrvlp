@@ -7,8 +7,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
 
-from src.utils.common import encode, decode
+from utils.common import encode, decode
 from .transforms import Compose, ListDictsToDictLists, PadTensors, StackTensors
 
 class DatasetLMDB(Dataset):
@@ -33,7 +34,7 @@ class DatasetLMDB(Dataset):
 
 class Images(DatasetLMDB):
 
-    def __init__(self, dir_data, split):
+    def __init__(self, dir_data, split, transform=None, do_normalize=True, **kwargs):
         super(Images, self).__init__(dir_data, split)
 
         self.path_envs['numims'] = os.path.join(self.dir_lmdb, split, 'numims.lmdb')
@@ -51,18 +52,23 @@ class Images(DatasetLMDB):
         self.txns['imnames'] = self.envs['imnames'].begin(write=False, buffers=True)
         self.txns['ims'] = self.envs['ims'].begin(write=False, buffers=True)
 
-
-        scale_size = 256
-        crop_size = 224
+        if not transform:
+            scale_size = 256
+            crop_size = 224
+            self.transform = transforms.Compose([
+                # transforms.Resize(scale_size),
+                transforms.RandomCrop(crop_size),
+                # transforms.CenterCrop(size),
+                # transforms.ToTensor(),  # divide by 255 automatically
+                # transforms.Normalize(mean=mean, std=std)
+            ])
+        else:
+            self.transform = transform
         mean = [0.485, 0.456, 0.406]
         std = [0.229, 0.224, 0.225]
-        self.transform = transforms.Compose([
-            # transforms.Resize(scale_size),
-            transforms.RandomCrop(crop_size),
-            # transforms.CenterCrop(size),
-            # transforms.ToTensor(),  # divide by 255 automatically
-            transforms.Normalize(mean=mean, std=std)
-        ])
+        self.do_normalize = do_normalize
+        self.normalize = transforms.Normalize(mean=mean, std=std)
+
 
     def format_path_img(self, raw_path):
         sitemap = os.path.basename(os.path.dirname(raw_path))
@@ -73,23 +79,28 @@ class Images(DatasetLMDB):
     def __getitem__(self, index):
         # select random image from list of images for that sample
         nb_images = self.get(index, 'numims')
-        im_idx = torch.randperm(nb_images)[0]
+        # im_idx = torch.randperm(nb_images)[0]
+        im_idx = 0
         index_img = self.get(index, 'impos')[im_idx]
         path_img = self.format_path_img(self.get(index_img, 'imnames'))
         image_data = self.get(index_img, 'ims')
         # image_data = image_data.convert('RGB')
 
         #transform
-        image_data = self.transform(image_data)
+        image_tensor = self.transform(image_data)
+        pil_image = TF.to_pil_image(image_tensor)
+        if self.do_normalize:
+            image_tensor = self.normalize(image_tensor)
 
-
-        item = {'data': image_data, 'index': index_img, 'path': path_img}
+        # item = {'data': image_tensor, 'index': index_img, 'pil_image': pil_image}
+        item = {'data': image_tensor, 'index': index_img, 'pil_image': pil_image, 'path': path_img}
+        # item = {'data': image_data, 'index': index_img, 'path': path_img}
 
         return item
 
 
 class Recipes(DatasetLMDB):
-    def __init__(self, dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale):
+    def __init__(self, dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale, path_layer1 = None, path_description = None, path_mask_embed = None, **kwargs):
         super(Recipes, self).__init__(dir_data, split)
 
         self.path_tokenized_recipes = path_tokenized_recipes
@@ -97,12 +108,37 @@ class Recipes(DatasetLMDB):
             self.tokenized_recipes = json.load(f)
 
         self.path_nutrs = path_nutrs
-        with open(self.path_nutrs) as f:
-            self.nutrs = json.load(f)
+        if self.path_nutrs:
+            print('load nutr')
+            with open(self.path_nutrs) as f:
+                self.nutrs = json.load(f)
 
         self.path_ingrs = path_ingrs
-        with open(self.path_ingrs) as f:
-            self.ingr_clss = json.load(f)
+        if self.path_ingrs:
+            print('load ingr')
+            with open(self.path_ingrs) as f:
+                self.ingr_clss = json.load(f)
+        self.path_layer1 = path_layer1
+        if self.path_layer1:
+            print('load layer1')
+            with open(self.path_layer1, 'r') as f:
+                layer1_ = json.load(f)
+            if isinstance(layer1_,list):
+                self.layer1 = {data['id']: data for data in layer1_}
+            else:
+                self.layer1 = layer1_
+
+        self.path_description = path_description
+        if self.path_description:
+            print('load description')
+            with open(self.path_description, 'rb') as f:
+                self.descriptions = pickle.load(f)
+
+        self.path_mask_embed = path_mask_embed
+        if self.path_mask_embed:
+            print('load mask_embed')
+            with open(self.path_mask_embed, 'rb') as f:
+                self.mask_embed = pickle.load(f)
 
         self.num_ingrs = num_ingrs
         self.nutr_names = nutr_names
@@ -137,7 +173,6 @@ class Recipes(DatasetLMDB):
         tokenized_ingrs = [l + (max_len - len(l))*[0] for l in tokenized_ingrs]
         item['ingrs'] = torch.LongTensor(tokenized_ingrs)
 
-
         # get instrs
         tokenized_instrs = recipe['instructions'][:self.max_instrs]
 
@@ -152,20 +187,38 @@ class Recipes(DatasetLMDB):
 
 
         #get nutrs
-        item['nutr'] = torch.tensor([self.nutrs[item['ids']][nutr_name] / self.nutr_scale[nutr_name] for nutr_name in self.nutr_names])
+        if self.path_nutrs:
+            item['nutr'] = torch.tensor([self.nutrs[item['ids']][nutr_name] / self.nutr_scale[nutr_name] for nutr_name in self.nutr_names])
 
         #get ingrs
-        item['ingr_clss'] = F.one_hot(torch.tensor(self.ingr_clss[item['ids']]),num_classes=self.num_ingrs).sum(0).bool().float()
+        if self.path_ingrs:
+            item['ingr_clss'] = F.one_hot(torch.tensor(self.ingr_clss[item['ids']]),num_classes=self.num_ingrs).sum(0).bool().float()
+
+        if self.path_layer1:
+            item['raw'] = self.layer1[item['ids']]
+
+        if self.path_description:
+            item['description'] = self.descriptions[item['ids']]
+
+        if self.path_mask_embed:
+            # print(item['ids'])
+            if item['ids'] in self.mask_embed.keys():
+                # print('key founded')
+                item['mask_embed'] = self.mask_embed[item['ids']]
+                # print(item['mask_embed'])
+            else:
+                print(f"key not founded: {item['ids']}")
+                item['mask_embed'] = torch.randn(512,dtype=torch.float32)
 
         #all texts title + ingredients + instructions
         item['texts'] = torch.cat([item['title'],ingrs_whole_text,instrs_whole_text])[:self.context_length]
         return item
 
 class FoodData(DatasetLMDB):
-    def __init__(self, dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale):
+    def __init__(self, dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale, **kwargs):
         super(FoodData, self).__init__(dir_data, split)
-        self.images_dataset = Images(dir_data, split)
-        self.recipes_dataset = Recipes(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale)
+        self.images_dataset = Images(dir_data, split, **kwargs)
+        self.recipes_dataset = Recipes(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale, **kwargs)
 
     def __getitem__(self, index):
         item = {}
@@ -175,8 +228,8 @@ class FoodData(DatasetLMDB):
         return item
 
 
-def make_data_loader(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, nutr_names, nutr_scale, batch_size=100, num_workers=4, shuffle=True, max_instrs_len=20, max_ingrs_len=15, max_instrs=20, max_ingrs=15):
-    dataset = FoodData(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale)
+def make_data_loader(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, nutr_names, nutr_scale, batch_size=100, num_workers=4, shuffle=True, max_instrs_len=20, max_ingrs_len=15, max_instrs=20, max_ingrs=15, **kwargs):
+    dataset = FoodData(dir_data, split, path_tokenized_recipes, path_nutrs, path_ingrs, num_ingrs, max_instrs_len, max_ingrs_len, max_instrs, max_ingrs, nutr_names, nutr_scale, **kwargs)
     return DataLoader(
         dataset,
         batch_size=batch_size,

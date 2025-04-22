@@ -21,6 +21,9 @@ _C.DATA.DIR = '/srv/datasets2/recipe1m+/food.com_data_rescaled'
 _C.DATA.PATH_TOKENIZED_RECIPES = '/srv/datasets2/recipe1m+/food.com_data_rescaled/text/tokenized_recipe.json'
 _C.DATA.PATH_NUTRS = '/srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/food.com_nutr_g_per_recipe.json'
 _C.DATA.PATH_INGRS = '/srv/datasets2/recipe1m+/food.com_data_rescaled/nutr/simplified_food_ids_per_recipes.json'
+_C.DATA.PATH_LAYER1 = ''
+_C.DATA.PATH_DESCRIPTION = ''
+_C.DATA.PATH_MASK_EMBED = ''
 # _C.DATA.SPLIT = 'train'
 _C.DATA.MAX_INSTRS_LEN = 20
 _C.DATA.MAX_INGRS_LEN = 15
@@ -52,11 +55,16 @@ _C.MODEL.IMAGE.IMAGE_MODEL = 'vit_base_patch16_224'
 _C.MODEL.NUTR = CN()
 _C.MODEL.NUTR.HIDDEN_DIM = 2048
 _C.MODEL.NUTR.NUM_LAYERS = 6
+_C.MODEL.SEGMENT = CN()
+_C.MODEL.SEGMENT.NAME = 'facebook/sam-vit-huge'
+_C.MODEL.DESCRIPTION = CN()
+_C.MODEL.DESCRIPTION.NAME = "meta-llama/Meta-Llama-3-8B-Instruct"
 
 # -----------------------------------------------------------------------------
 # train
 # -----------------------------------------------------------------------------
 _C.TRAIN = CN()
+_C.TRAIN.NAME = 'car'
 _C.TRAIN.SEED = 12345
 _C.TRAIN.BATCH_SIZE = 64
 _C.TRAIN.NUM_EPOCHS = 100
@@ -71,11 +79,14 @@ _C.TRAIN.RECIPE_LOSS_WEIGHT = 1.0
 _C.TRAIN.MAE_WEIGHT = 0.01
 _C.TRAIN.INGRS_WEIGHT = 0.025
 _C.TRAIN.WARMUP_EPOCHS = 10
+_C.TRAIN.CHECKPOINT = ''
+_C.TRAIN.RESUME = False
 
 # -----------------------------------------------------------------------------
 # eval
 # -----------------------------------------------------------------------------
 _C.EVAL = CN()
+_C.EVAL.NAME = 'nutr_ht'
 
 # -----------------------------------------------------------------------------
 # infer

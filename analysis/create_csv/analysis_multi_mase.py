@@ -27,6 +27,7 @@ def cal_iou(input_1, input_2):
     u = input_1.union(input_2)
     i = input_1.intersection(input_2)
     return len(i) / len(u)
+
 def cal_weighted_iou(input_1, input_2, w_1, w_2):
     all_weight = sum(w_1) + sum(w_2)
     intersect_weight = 0.
@@ -34,7 +35,7 @@ def cal_weighted_iou(input_1, input_2, w_1, w_2):
         if ingr in input_2:
             j = input_2.index(ingr)
             intersect_weight += w_1[i] + w_2[j]
-    return intersect_weight / all_weight
+    return intersect_weight / (all_weight + 1e-8)
 
 def cal_mean_iou(im2recipe_dict,food_ids_per_recipes,weighted_food_ids_per_recipes):
     ious = []
@@ -115,19 +116,19 @@ def main():
     # ]
     # output_name = 'ht2_newest_all_comaparison'
 
-    dirs = [
-        'ht/base',
-        'tfood/base',
-        'vlpcook/base',
-        'clip/img/test',
-        'clip/text/test',
-        'clip/text_img/test',
-        # 'nutr_vlp/base/food_test',
-        # 'deep/direct_ingrs_3_branches/base/food_test_recipe_img',
-        # 'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_img',
-        'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
-    ]
-    output_name = 'ht3_newest_all_comaparison'
+    # dirs = [
+    #     'ht/base',
+    #     'tfood/base',
+    #     'vlpcook/base',
+    #     'clip/img/test',
+    #     'clip/text/test',
+    #     'clip/text_img/test',
+    #     # 'nutr_vlp/base/food_test',
+    #     # 'deep/direct_ingrs_3_branches/base/food_test_recipe_img',
+    #     # 'deep_ht/direct_ingrs_3_branches/base/food_test_recipe_img',
+    #     'deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only',
+    # ]
+    # output_name = 'ht3_newest_all_comaparison'
 
     # dirs = [
     #     'deep/base/base/food_test_all_domains',
@@ -211,6 +212,96 @@ def main():
     # ]
 
     # output_name = 'complete_ablation_ht3_recipe_only'
+
+    # dirs = [
+    #     'ht/base',
+    #     'tfood/base_wo_clip/_recipe_only',
+    #     'tfood/base_w_clip/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m+/_recipe_only',
+    #     'vlp/org_train_recipe1m+/_recipe_only',
+    # ]
+    # output_name = 'cvpr'
+
+    # dirs = [
+    #     'ht/base',
+    #     'reranked_100/ht/base',
+    #     'tfood/base_wo_clip/_recipe_only',
+    #     'reranked_100/tfood/base_wo_clip/_recipe_only',
+    #     'tfood/base_w_clip/_recipe_only',
+    #     'reranked_100/tfood/base_w_clip/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m/_recipe_only',
+    #     'reranked_100/vlp/org_finetuned_recipe1m/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m+/_recipe_only',
+    #     'reranked_100/vlp/org_finetuned_recipe1m+/_recipe_only',
+    #     'vlp/org_train_recipe1m+/_recipe_only',
+    #     'reranked_100/vlp/org_train_recipe1m+/_recipe_only',
+    #     'reranked_100/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only'
+    # ]
+    # output_name = 'rerank'
+
+    # dirs = [
+    #     'ht/base',
+    #     'reranked_100_direct/ht/base',
+    #     'tfood/base_wo_clip/_recipe_only',
+    #     'reranked_100_direct/tfood/base_wo_clip/_recipe_only',
+    #     'tfood/base_w_clip/_recipe_only',
+    #     'reranked_100_direct/tfood/base_w_clip/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m/_recipe_only',
+    #     'reranked_100_direct/vlp/org_finetuned_recipe1m/_recipe_only',
+    #     'vlp/org_finetuned_recipe1m+/_recipe_only',
+    #     'reranked_100_direct/vlp/org_finetuned_recipe1m+/_recipe_only',
+    #     'vlp/org_train_recipe1m+/_recipe_only',
+    #     'reranked_100_direct/vlp/org_train_recipe1m+/_recipe_only',
+    #     'reranked_100_direct/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only'
+    # ]
+    # output_name = 'rerank_direct'
+
+    # dirs = [
+    #     'reranked_100/ht/base',
+    #     'reranked_100_wo_nutr/ht/base',
+    #     'reranked_100_wo_ingr/ht/base',
+    # ]
+    # output_name = 'rerank_ablation'
+
+    # dirs = [
+    #     'reranked_100_direct/ht/base',
+    #     'reranked_100_wo_nutr_direct/ht/base',
+    #     'reranked_100_wo_ingr_direct/ht/base',
+    # ]
+    # output_name = 'rerank_direct_ablation'
+
+    dirs = [
+        'ht/base',
+        'reranked_100_weighted/ht/base/0.3',
+        'tfood/base_wo_clip/_recipe_only',
+        'reranked_100_weighted/tfood/base_wo_clip/_recipe_only/0.3',
+        'tfood/base_w_clip/_recipe_only',
+        'reranked_100_weighted/tfood/base_w_clip/_recipe_only/0.3',
+        'vlp/org_finetuned_recipe1m/_recipe_only',
+        'reranked_100_weighted/vlp/org_finetuned_recipe1m/_recipe_only/0.3',
+        'vlp/org_finetuned_recipe1m+/_recipe_only',
+        'reranked_100_weighted/vlp/org_finetuned_recipe1m+/_recipe_only/0.3',
+        'vlp/org_train_recipe1m+/_recipe_only',
+        'reranked_100_weighted/vlp/org_train_recipe1m+/_recipe_only/0.3',
+        'reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.3'
+    ]
+    output_name = 'rerank_weighted'
+
+    # dirs = [
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.0',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.1',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.2',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.3',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.4',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.5',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.6',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.7',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.8',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/0.9',
+    #     '/reranked_100_weighted/deep_ht/direct_ingrs_3_branches/no_nutr/food_test_recipe_only/1.0',
+    # ]
+    # output_name = 'rerank_weighted_ablation'
 
 
     with open('/home/parinayok/nutr1m/data_crawl/food.com_annotated_nutr_per_recipe_old.json') as f:

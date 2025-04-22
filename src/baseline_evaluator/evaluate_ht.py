@@ -9,7 +9,7 @@ import sys
 from tqdm import tqdm
 
 
-sys.path.append('/home/parinayok/food.com_net')
+sys.path.append('/home/parinayok/food.com_net/src')
 
 from dataset import create_data
 import init_config

@@ -1,0 +1,12 @@
+name: vlpcook
+channels:
+  - pytorch
+  - nvidia
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch-cuda=12.1
+  - pytorch
+  - torchvision

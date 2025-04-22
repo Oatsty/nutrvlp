@@ -1,0 +1,43 @@
+name: vlpcook
+channels:
+  - pytorch
+  - nvidia
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - ipykernel
+  - json5
+  - lz4-c
+  - matplotlib-base
+  - matplotlib-inline
+  - nltk
+  - notebook
+  - numpy
+  - numpy-base
+  - pillow
+  - pip
+  - pytorch
+  - pytorch-cuda=12.1
+  - pyyaml
+  - scikit-image
+  - scikit-learn
+  - scipy
+  - timm
+  - torchvision
+  - tqdm
+  - typing_extensions
+  - yaml
+  - pip:
+    - argparse
+    - huggingface-hub
+    - lmdb
+    - opencv-python
+    - pandas
+    - seaborn
+    - spacy
+    - spacy-legacy
+    - spacy-loggers
+    - tokenizers
+    - transformers

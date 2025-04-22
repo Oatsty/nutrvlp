@@ -108,5 +108,17 @@ class Evaluator(nn.Module):
 
         np.save(os.path.join(self.save_dir,'im2recipe'), im2recipe)
         np.save(os.path.join(self.save_dir, 'recipe2im'), recipe2im)
+        np.save(os.path.join(self.save_dir, 'distances'), distances)
+
+
+        # for addtional evaluation
+        r2rdistances = cos_dist(rc_matrix, rc_matrix)
+        i2idistances = cos_dist(im_matrix, im_matrix)
+        r2r = np.argsort(r2rdistances.numpy(), axis=1)
+        i2i = np.argsort(i2idistances.numpy(), axis=1)
+        np.save(os.path.join(self.save_dir,'recipe2recipe'), r2r)
+        np.save(os.path.join(self.save_dir, 'im2im'), i2i)
+        np.save(os.path.join(self.save_dir, 'r2rdistances'), r2rdistances)
+        np.save(os.path.join(self.save_dir, 'i2idistances'), i2idistances)
 
         self.im2recipe_saved = True

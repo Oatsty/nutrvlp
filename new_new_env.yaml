@@ -1,0 +1,39 @@
+name: car
+channels:
+  - pytorch
+  - nvidia
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch=2.3.0=py3.10_cuda12.1_cudnn8.9.2_0
+  - torchvision=0.18.0=py310_cu121
+  - pytorch-cuda=12.1
+  - ipykernel
+  - json5
+  - matplotlib-base
+  - matplotlib-inline
+  - nltk
+  - notebook
+  - numpy
+  - pillow
+  - pyyaml
+  - scikit-image
+  - scikit-learn
+  - scipy
+  - timm
+  - tqdm
+  - typing_extensions
+  - yaml
+  - pip:
+    - argparse
+    - huggingface-hub
+    - lmdb
+    - opencv-python
+    - pandas
+    - seaborn
+    - spacy
+    - tokenizers
+    - transformers
+    - yacs

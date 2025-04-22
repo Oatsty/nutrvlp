@@ -6,3 +6,6 @@ log/
 __pycache__
 /ht_checkpoints/
 /analysis/figs/
+Meta-Llama-3-8B-Instruct
+tfood_checkpoints
+sam_vit_h_4b8939.pth
